@@ -99,3 +99,37 @@ export const getSentMails = (senderEmail) => {
     }
   };
 };
+
+
+// Function to mark an email as read
+export const markEmailAsRead = (emailId,isSender) => {
+  return async (dispatch) => {
+    try {
+      console.log("Marking email as read for ID:", emailId);
+      
+      const response = await fetch(`http://localhost:8000/email/read/${emailId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body:JSON.stringify({isSender}),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        const errorMessage = errorData.error || "Failed to mark email as read.";
+        throw new Error(errorMessage);
+      }
+
+      const data = await response.json();
+      console.log("Mark as read response:", data);
+
+      // Optionally update Redux state if you want immediate feedback
+      dispatch(emailActions.markEmailAsReadSuccess(emailId,isSender));
+
+      console.log("Email marked as read:", emailId);
+    } catch (error) {
+      console.error("Error marking email as read:", error);
+    }
+  };
+};

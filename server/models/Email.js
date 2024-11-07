@@ -7,7 +7,8 @@ const emailSchema = new mongoose.Schema({
     subject: { type: String, required: true },
     message: { type: String, required: true },
     sentAt: { type: Date, default: Date.now },
-    isRead: { type: Boolean, default: false },
+    isReadSender: { type: Boolean, default: false },
+    isReadReceiver:{type:Boolean,default:false},
     deletedBySender: { type: Boolean, default: false },
     deletedByRecipient: { type: Boolean, default: false },
   });

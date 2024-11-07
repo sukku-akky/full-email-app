@@ -1,12 +1,12 @@
 const express = require("express");
 const signupModel = require("./models/Signup");
-const emailModel=require("./models/Email");
+const emailModel = require("./models/Email");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const bcrypt=require("bcryptjs")
+const bcrypt = require("bcryptjs");
 const app = express();
 const jwt = require("jsonwebtoken");
-const SECRET_KEY = "yourSecretKey"; 
+const SECRET_KEY = "yourSecretKey";
 app.use(express.json());
 app.use(
   cors({
@@ -35,7 +35,6 @@ app.listen(8000, () => {
 app.get("/", (req, res) => {
   res.send("hy");
 });
-
 
 app.post("/signup", async (req, res) => {
   try {
@@ -85,13 +84,11 @@ app.post("/login", async (req, res) => {
     });
 
     // If credentials are correct, respond with success message or token
-    res.json({ message: "Login successful", token});
+    res.json({ message: "Login successful", token });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
-
-
 
 app.post("/sendEmail", async (req, res) => {
   console.log("Request body:", req.body);
@@ -106,37 +103,65 @@ app.post("/sendEmail", async (req, res) => {
       message,
     });
 
-    res.status(200).json({ message: "Email sent successfully", email: newEmail });
+    res
+      .status(200)
+      .json({ message: "Email sent successfully", email: newEmail });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-
 // GET endpoint to retrieve inbox emails for a recipient
 app.get("/inbox/:recipientEmail", async (req, res) => {
   const { recipientEmail } = req.params;
-  
+
   try {
-    const inboxEmails = await emailModel.find({ recipient: recipientEmail }).sort({ timestamp: -1 });
+    const inboxEmails = await emailModel
+      .find({ recipient: recipientEmail })
+      .sort({ timestamp: -1 });
     res.json(inboxEmails);
   } catch (error) {
-    res.status(500).json({ error: `Error retrieving inbox:${error.message} `});
+    res.status(500).json({ error: `Error retrieving inbox:${error.message} ` });
   }
 });
-
-
-
 
 // API endpoint to retrieve sent emails
 app.get("/sent/:senderEmail", async (req, res) => {
   const { senderEmail } = req.params;
   console.log("Sender Email:", senderEmail);
   try {
-    const sentEmails = await emailModel.find({ sender: senderEmail }).sort({ sentAt: -1 });
+    const sentEmails = await emailModel
+      .find({ sender: senderEmail })
+      .sort({ sentAt: -1 });
     res.json(sentEmails);
   } catch (error) {
     console.error("Error retrieving sent emails:", error);
-    res.status(500).json({ error: `Error retrieving sent emails:${error.message}` });
+    res
+      .status(500)
+      .json({ error: `Error retrieving sent emails:${error.message}` });
+  }
+});
+
+app.put("/email/read/:emailId", async (req, res) => {
+  try {
+    const { emailId } = req.params;
+    const {isSender}=req.body;
+
+    const email=await emailModel.findById(emailId);
+
+    if(!email){
+      return res.status(404).json({error:'Email not found'})
+    }
+    
+    if(isSender){
+      email.isReadSender=true;
+    } else{
+      email.isReadReceiver=true;
+    }
+    await email.save();
+    res.json(email);
+  } catch (e) {
+    console.error("Error marking email as read:", error);
+    res.status(500).json({ error: "Failed to mark email as read" });
   }
 });

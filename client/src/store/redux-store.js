@@ -1,6 +1,5 @@
 import { createSlice, configureStore } from "@reduxjs/toolkit";
 
-
 const initialEmailState = {
   sentEmails: [],
   receivedEmails: [],
@@ -9,7 +8,7 @@ const initialEmailState = {
 };
 
 const emailSlice = createSlice({
-  name: 'email',
+  name: "email",
   initialState: initialEmailState,
   reducers: {
     sendEmailRequest(state) {
@@ -32,9 +31,27 @@ const emailSlice = createSlice({
     deleteEmailSuccess(state, action) {
       const { emailId, isSent } = action.payload; // Email ID and whether it was sent or received
       if (isSent) {
-        state.sentEmails = state.sentEmails.filter(email => email._id !== emailId);
+        state.sentEmails = state.sentEmails.filter(
+          (email) => email._id !== emailId
+        );
       } else {
-        state.receivedEmails = state.receivedEmails.filter(email => email._id !== emailId);
+        state.receivedEmails = state.receivedEmails.filter(
+          (email) => email._id !== emailId
+        );
+      }
+    },
+    markEmailAsReadSuccess(state, action) {
+      const { emailId ,isSender} = action.payload;
+      if (isSender) {
+        // Update sender's read status
+        state.sentEmails = state.sentEmails.map((email) =>
+          email._id === emailId ? { ...email, isReadSender: true } : email
+        );
+      } else {
+        // Update receiver's read status
+        state.receivedEmails = state.receivedEmails.map((email) =>
+          email._id === emailId ? { ...email, isReadReceiver: true } : email
+        );
       }
     },
     clearEmailError(state) {
@@ -91,16 +108,13 @@ const authSlice = createSlice({
   },
 });
 
-
-
-
 const store = configureStore({
   reducer: {
     auth: authSlice.reducer,
-    email:emailSlice.reducer,
+    email: emailSlice.reducer,
   },
 });
 
-export const emailActions=emailSlice.actions;
+export const emailActions = emailSlice.actions;
 export const authActions = authSlice.actions;
 export default store;
