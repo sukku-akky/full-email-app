@@ -1,0 +1,58 @@
+.compose-background {
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  height: 100vh; /* Full height of the viewport */
+  width: 100vw; /* Full width of the viewport */
+  background-color: gray; /* Background color */
+}
+
+.compose-container {
+  display: flex;
+  flex-direction: column;
+  height: 90vh;
+  width: 90vh; /* Adjust the width as needed */
+  padding: 20px; /* Optional padding */
+  background-color: white; /* Background color of the compose box */
+  border-radius: 10px; /* Optional rounded corners */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Optional shadow effect */
+  justify-content: center;
+}
+
+.compose-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.editor-container {
+  margin-top: 10px; /* Space above the editor */
+  flex-grow: 1; /* Allow the editor to take available space */
+  border: 1px solid #ddd; /* Optional border for the editor */
+  min-height: 100px; /* Minimum height for the editor */
+}
+
+.compose-footer {
+  display: flex;
+  align-items: center; /* Align items vertically */
+  justify-content: space-between; /* Space between buttons */
+  margin-top: auto; /* Push footer to the bottom */
+  padding: 10px 0; /* Padding for the footer */
+}
+
+.footer-buttons {
+  display: flex;
+  justify-content: center; /* Center buttons horizontally */
+  align-items: center; /* Center buttons vertically */
+}
+
+.footer-buttons button {
+  margin: 0 5px; /* Optional margin between buttons */
+  padding: 8px 16px; /* Adjust button size */
+}
+
+.toolbar-container {
+  flex-grow: 1; /* Allow the toolbar to take available space */
+  display: flex;
+  justify-content: flex-end; /* Align toolbar items to the right */
+}
