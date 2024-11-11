@@ -100,20 +100,22 @@ export const getSentMails = (senderEmail) => {
   };
 };
 
-
 // Function to mark an email as read
-export const markEmailAsRead = (emailId,isSender) => {
+export const markEmailAsRead = (emailId, isSender) => {
   return async (dispatch) => {
     try {
       console.log("Marking email as read for ID:", emailId);
-      
-      const response = await fetch(`http://localhost:8000/email/read/${emailId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body:JSON.stringify({isSender}),
-      });
+
+      const response = await fetch(
+        `http://localhost:8000/email/read/${emailId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ isSender }),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -125,11 +127,45 @@ export const markEmailAsRead = (emailId,isSender) => {
       console.log("Mark as read response:", data);
 
       // Optionally update Redux state if you want immediate feedback
-      dispatch(emailActions.markEmailAsReadSuccess(emailId,isSender));
+      dispatch(emailActions.markEmailAsReadSuccess({ emailId, isSender }));
 
       console.log("Email marked as read:", emailId);
     } catch (error) {
       console.error("Error marking email as read:", error);
+    }
+  };
+};
+
+export const deleteEmail = (emailId, isSender) => {
+  return async (dispatch) => {
+    try {
+      console.log("Deleting email with ID:", emailId, "as", isSender ? "sender" : "recipient");
+
+      const response = await fetch(
+        `http://localhost:8000/email/delete/${emailId}/${isSender}`, // Sending isSender in URL
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        const errorMessage = errorData.error || "Failed to delete email.";
+        throw new Error(errorMessage);
+      }
+
+      const data = await response.json();
+      console.log("Delete response:", data);
+
+      // Optionally update Redux state if you want immediate feedback
+      dispatch(emailActions.deleteEmailSuccess({ emailId, isSender }));
+
+      console.log("Email deleted:", emailId);
+    } catch (error) {
+      console.error("Error deleting email:", error.message);
     }
   };
 };

@@ -3,6 +3,8 @@ import { createSlice, configureStore } from "@reduxjs/toolkit";
 const initialEmailState = {
   sentEmails: [],
   receivedEmails: [],
+  isReadSender:false,
+  isReadRecipient:false,
   loading: false,
   error: null,
 };
@@ -23,20 +25,20 @@ const emailSlice = createSlice({
       state.error = action.payload; // Error message
     },
     fetchSentEmailsSuccess(state, action) {
-      state.sentEmails = action.payload; // Assuming payload is an array of sent emails
+      state.sentEmails = action.payload.filter(email=>!email.deletedBySender); // Assuming payload is an array of sent emails
     },
     fetchReceivedEmailsSuccess(state, action) {
-      state.receivedEmails = action.payload; // Assuming payload is an array of received emails
+      state.receivedEmails = action.payload.filter(email=>!email.deletedByRecipient) // Assuming payload is an array of received emails
     },
     deleteEmailSuccess(state, action) {
-      const { emailId, isSent } = action.payload; // Email ID and whether it was sent or received
-      if (isSent) {
+      const { emailId, isSender } = action.payload; // Email ID and whether it was sent or received
+      if (isSender) {
         state.sentEmails = state.sentEmails.filter(
-          (email) => email._id !== emailId
+          email => email._id !== emailId
         );
       } else {
         state.receivedEmails = state.receivedEmails.filter(
-          (email) => email._id !== emailId
+          email => email._id !== emailId
         );
       }
     },
@@ -44,12 +46,12 @@ const emailSlice = createSlice({
       const { emailId ,isSender} = action.payload;
       if (isSender) {
         // Update sender's read status
-        state.sentEmails = state.sentEmails.map((email) =>
+        state.sentEmails = state.sentEmails.map(email =>
           email._id === emailId ? { ...email, isReadSender: true } : email
         );
       } else {
         // Update receiver's read status
-        state.receivedEmails = state.receivedEmails.map((email) =>
+        state.receivedEmails = state.receivedEmails.map(email =>
           email._id === emailId ? { ...email, isReadReceiver: true } : email
         );
       }

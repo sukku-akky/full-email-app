@@ -4,6 +4,7 @@ import Compose from "./compose/Compose";
 import LoginPage from "./components/Auth/LoginForm";
 import { useSelector } from "react-redux";
 import MainPage from "./pages/MainPage";
+
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
@@ -19,6 +20,7 @@ function App() {
     <Route path="/signup" element={<SignupPage/>}></Route>
     <Route path="/compose" element={<Compose/>}></Route>
     <Route path="/home" element={<MainPage/>}></Route>
+   
    </Routes>
    
    </>

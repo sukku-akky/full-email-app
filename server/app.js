@@ -145,23 +145,58 @@ app.get("/sent/:senderEmail", async (req, res) => {
 app.put("/email/read/:emailId", async (req, res) => {
   try {
     const { emailId } = req.params;
-    const {isSender}=req.body;
+    const { isSender } = req.body;
 
-    const email=await emailModel.findById(emailId);
+    const email = await emailModel.findById(emailId);
 
-    if(!email){
-      return res.status(404).json({error:'Email not found'})
+    if (!email) {
+      return res.status(404).json({ error: "Email not found" });
     }
-    
-    if(isSender){
-      email.isReadSender=true;
-    } else{
-      email.isReadReceiver=true;
+
+    if (isSender) {
+      email.isReadSender = true;
+    } else {
+      email.isReadReceiver = true;
     }
     await email.save();
     res.json(email);
   } catch (e) {
     console.error("Error marking email as read:", error);
     res.status(500).json({ error: "Failed to mark email as read" });
+  }
+});
+
+// Delete email conditionally based on sender or receiver
+app.delete("/email/delete/:emailId/:isSender", async (req, res) => {
+  try {
+    const { emailId, isSender } = req.params;
+
+    
+    const email = await emailModel.findById(emailId);
+
+    if (!email) {
+      return res.status(404).json({ error: "Email not found" });
+    }
+
+    
+    const isSenderFlag = isSender === "true"; // Convert to boolean
+
+    if (isSenderFlag) {
+      email.deletedBySender = true;
+    } else {
+      email.deletedByRecipient = true;
+    }
+
+    
+    if (email.deletedBySender && email.deletedByRecipient) {
+      await email.deleteOne(); // Permanently delete from database
+      res.json({ message: "Email fully deleted" });
+    } else {
+      await email.save(); // Save the deletion status update
+      res.json({ message: "Email marked as deleted for user" });
+    }
+  } catch (error) {
+    console.error("Error deleting email:", error);
+    res.status(500).json({ error:error.message ||  "Failed to delete email" });
   }
 });

@@ -44,6 +44,7 @@ function Compose() {
       };
   
       dispatch(sendEmail(emailData));
+      navigate("/home");
     } catch (error) {
       console.error("Error converting content to raw format:", error);
     }
