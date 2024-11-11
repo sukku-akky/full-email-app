@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ListGroup, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft,Trash } from "react-bootstrap-icons";
+import { ArrowLeft, Trash } from "react-bootstrap-icons";
 import {
   getInboxMails,
   deleteEmail,
@@ -9,6 +9,7 @@ import {
   markEmailAsRead,
 } from "../../store/email-actions";
 import { useDispatch, useSelector } from "react-redux";
+import { emailActions } from "../../store/redux-store";
 //import { getMails } from '../services/mailService'; // Assume this fetches data from Firebase
 
 const MailList = ({ folder }) => {
@@ -17,7 +18,7 @@ const MailList = ({ folder }) => {
   const userEmail = useSelector((state) => state.auth.email);
   const inboxEmails = useSelector((state) => state.email.receivedEmails) || [];
   const sentEmails = useSelector((state) => state.email.sentEmails) || [];
-  const [selectedEmail, setSelectedEmail] = useState(null);
+  const [selectedEmail,setSelectedEmail]=useState(null);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -30,14 +31,13 @@ const MailList = ({ folder }) => {
   };
 
   const handleBackToList = () => {
-    setSelectedEmail(null); // Go back to the email list
+    setSelectedEmail(null);// Go back to the email list
   };
 
-  const handleDeleteEmail=(email)=>{
-    dispatch(deleteEmail(email._id,email.sender===userEmail));
+  const handleDeleteEmail = (email) => {
+    dispatch(deleteEmail(email._id, email.sender === userEmail));
     setSelectedEmail(null);
-
-  }
+  };
 
   useEffect(() => {
     if (folder === "inbox") {
@@ -45,6 +45,20 @@ const MailList = ({ folder }) => {
     } else if (folder === "sent") {
       dispatch(getSentMails(userEmail));
     }
+  }, [folder, dispatch, userEmail]);
+
+  useEffect(() => {
+    // Poll for new emails every 2 seconds
+    const interval = setInterval(() => {
+      if (folder === "inbox") {
+        dispatch(getInboxMails(userEmail)); // Fetch inbox emails
+      } else if (folder === "sent") {
+        dispatch(getSentMails(userEmail)); // Fetch sent emails
+      }
+    }, 2000); // 2 seconds interval
+
+    // Clear the interval when the component unmounts
+    return () => clearInterval(interval);
   }, [folder, dispatch, userEmail]);
 
   const mails = folder === "inbox" ? inboxEmails : sentEmails;

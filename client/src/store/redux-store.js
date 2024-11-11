@@ -3,8 +3,7 @@ import { createSlice, configureStore } from "@reduxjs/toolkit";
 const initialEmailState = {
   sentEmails: [],
   receivedEmails: [],
-  isReadSender:false,
-  isReadRecipient:false,
+  selectedEmail:[],
   loading: false,
   error: null,
 };
@@ -41,6 +40,10 @@ const emailSlice = createSlice({
           email => email._id !== emailId
         );
       }
+    },
+    setSelectedEmail(state,action){
+      state.selectedEmail=action.payload;
+
     },
     markEmailAsReadSuccess(state, action) {
       const { emailId ,isSender} = action.payload;
